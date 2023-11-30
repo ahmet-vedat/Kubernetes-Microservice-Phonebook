@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+
+kind: Deployment
+metadata:
+  labels:
+     app: web-deploy
+  name: web-deploy
+spec:
+  replicas: 1 
+  selector:
+    matchLabels:
+      app: web-deploy
+  template:
+    metadata:
+      labels:
+        app: web-deploy
+    spec:
+      containers:
+      - name: result 
+        image: avkya/webserver
+        
+        ports:
+        - containerPort: 80
+        envFrom:
+        - configMapRef:
+            name: web-configmap
+        - secretRef:
+            name: mysql-secret
+          # - name: MYSQL_PASSWORD  
+          #   value: Clarusway_1
+          # - name: MYSQL_USER
+          #   value: clarus
+          # - name: MYSQL_DATABASE
+          #   value: phonebook
+          # - name: MYSQL_DATABASE_HOST  
+          #   value: mysql
+--- 
+apiVersion: v1
+kind: Service
+metadata:
+  lawebserver-svcbels:
+    app: webserver-svc
+  name: 
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+    nodePort: 30001
+  selector:
+    app: web-deploy
+  type: NodePort

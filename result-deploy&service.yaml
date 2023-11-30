@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+
+kind: Deployment
+metadata:
+  labels:
+     app: result-deploy
+  name: result-deploy
+spec:
+  replicas: 1 
+  selector:
+    matchLabels:
+      app: result-deploy
+  template:
+    metadata:
+      labels:
+        app: result-deploy
+    spec:
+      containers:
+      - name: result 
+        image: avkya/resultserver
+        
+        ports:
+        - containerPort: 80
+        envFrom:
+        -  configMapRef:
+             name: web-configmap 
+        - secretRef:
+            name: mysql-secret
+          # - name: MYSQL_PASSWORD  
+          #   value: Clarusway_1
+          # - name: MYSQL_USER
+          #   value: clarus
+          # - name: MYSQL_DATABASE
+          #   value: phonebook
+          # - name: MYSQL_DATABASE_HOST  
+          #   value: mysql
+--- 
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: resultserver-svc
+  name: resultserver-svc
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+    nodePort: 30002
+  selector:
+    app: result-deploy
+  type: NodePort
+
+  
